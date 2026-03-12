@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { loadStudents, getStudents, getStudentById } from "./students.js";
 import { generateSummary, chat } from "./chat.js";
+import { getClrData } from "./clr.js";
 
 const app = express();
 app.use(cors());
@@ -20,14 +21,35 @@ app.get("/api/students", (_req, res) => {
   );
 });
 
-// Get student detail + AI summary
+// Get student detail (instant, no LLM)
+app.get("/api/students/:id", (req, res) => {
+  const student = getStudentById(req.params.id);
+  if (!student) return res.status(404).json({ error: "Student not found" });
+  res.json(student);
+});
+
+// Get CLR data (instant, no LLM)
+app.get("/api/students/:id/clr", async (req, res) => {
+  const student = getStudentById(req.params.id);
+  if (!student) return res.status(404).json({ error: "Student not found" });
+
+  try {
+    const clr = await getClrData(student.id);
+    res.json({ hasClr: !!clr, clr });
+  } catch (err: any) {
+    console.error("CLR error:", err.message);
+    res.status(500).json({ error: "Failed to fetch CLR" });
+  }
+});
+
+// Get AI summary
 app.get("/api/students/:id/summary", async (req, res) => {
   const student = getStudentById(req.params.id);
   if (!student) return res.status(404).json({ error: "Student not found" });
 
   try {
-    const summary = await generateSummary(student);
-    res.json({ student, summary });
+    const { summary, hasClr } = await generateSummary(student);
+    res.json({ student, summary, hasClr });
   } catch (err: any) {
     console.error("Summary error:", err.message);
     res.status(500).json({ error: "Failed to generate summary" });
@@ -59,4 +81,5 @@ app.listen(3001, async () => {
   } catch (err: any) {
     console.error("Failed to load students:", err.message);
   }
+
 });

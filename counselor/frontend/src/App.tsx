@@ -1,6 +1,7 @@
 import { useState } from "react";
 import StudentList from "./StudentList";
-import StudentView from "./StudentView";
+import ChatPane from "./ChatPane";
+import SummaryPane from "./SummaryPane";
 
 export interface StudentSummary {
   id: string;
@@ -16,33 +17,52 @@ export default function App() {
 
   return (
     <div style={{ display: "flex", height: "100vh", fontFamily: "system-ui" }}>
+      {/* Left: Student list */}
       <div
         style={{
-          width: 280,
+          width: 240,
           borderRight: "1px solid #ddd",
           overflow: "auto",
           background: "#f8f9fa",
+          flexShrink: 0,
         }}
       >
         <StudentList api={API} selected={selected} onSelect={setSelected} />
       </div>
-      <div style={{ flex: 1, overflow: "auto" }}>
-        {selected ? (
-          <StudentView key={selected.id} student={selected} api={API} />
-        ) : (
+
+      {selected ? (
+        <>
+          {/* Middle: Chat */}
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <ChatPane key={selected.id} student={selected} api={API} />
+          </div>
+
+          {/* Right: Summary + CLR */}
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-              color: "#888",
+              width: 360,
+              borderLeft: "1px solid #ddd",
+              overflow: "auto",
+              background: "#fafafa",
+              flexShrink: 0,
             }}
           >
-            Select a student to begin
+            <SummaryPane key={`summary-${selected.id}`} student={selected} api={API} />
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#888",
+          }}
+        >
+          Select a student to begin
+        </div>
+      )}
     </div>
   );
 }

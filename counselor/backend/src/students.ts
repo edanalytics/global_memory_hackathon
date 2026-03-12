@@ -53,11 +53,33 @@ function mapRow(row: DimStudentRow): Student {
 let students: Student[] = [];
 
 export async function loadStudents(): Promise<void> {
-  const rows = await query<DimStudentRow>(
-    "SELECT * FROM dev_analytics.dev_rl_wh.dim_student WHERE IS_LATEST_RECORD = TRUE AND GRADE_LEVEL = '12' ORDER BY LAST_NAME, FIRST_NAME"
+  // Students with goals (demo priority)
+  const withGoals = await query<DimStudentRow>(
+    `SELECT s.* FROM dev_analytics.dev_rl_wh.dim_student s
+     INNER JOIN dev_analytics.dev_rl_clr.student_aligned_goals g ON s.K_STUDENT = g.K_STUDENT
+     WHERE s.IS_LATEST_RECORD = TRUE
+     ORDER BY s.LAST_NAME, s.FIRST_NAME`
   );
-  students = rows.map(mapRow);
-  console.log(`Loaded ${students.length} students from Snowflake`);
+
+  const goalStudentIds = new Set(withGoals.map((r) => r.K_STUDENT));
+
+  // 4 more without goals
+  const withoutGoals = await query<DimStudentRow>(
+    `SELECT * FROM dev_analytics.dev_rl_wh.dim_student
+     WHERE IS_LATEST_RECORD = TRUE
+     ORDER BY LAST_NAME, FIRST_NAME
+     LIMIT 20`
+  );
+  const extras = withoutGoals.filter((r) => !goalStudentIds.has(r.K_STUDENT)).slice(0, 4);
+
+  // Deduplicate (in case of multiple goals per student)
+  const deduped = new Map<string, DimStudentRow>();
+  for (const r of [...withGoals, ...extras]) {
+    if (!deduped.has(r.K_STUDENT)) deduped.set(r.K_STUDENT, r);
+  }
+
+  students = Array.from(deduped.values()).map(mapRow);
+  console.log(`Loaded ${students.length} students (${goalStudentIds.size} with goals, ${extras.length} without)`);
 }
 
 export function getStudents(): Student[] {
