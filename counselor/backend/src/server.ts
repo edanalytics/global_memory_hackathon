@@ -4,8 +4,9 @@ import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import { loadStudents, getStudents, getStudentById } from "./students.js";
-import { generateSummary, chat, clearStudentCache } from "./chat.js";
+import { generateSummary, chat, clearStudentCache, getChatHistory } from "./chat.js";
 import { getClrData, clearClrCache } from "./clr.js";
+import { loadMajors } from "./majors.js";
 
 const app = express();
 app.use(cors());
@@ -51,7 +52,8 @@ app.get("/api/students/:id/summary", async (req, res) => {
 
   try {
     const { summary, hasClr } = await generateSummary(student);
-    res.json({ student, summary, hasClr });
+    const history = getChatHistory(student.id);
+    res.json({ student, summary, hasClr, history });
   } catch (err: any) {
     console.error("Summary error:", err.message);
     res.status(500).json({ error: "Failed to generate summary" });
@@ -98,9 +100,9 @@ app.listen(3001, async () => {
   console.log("Counselor backend running on http://localhost:3001");
 
   try {
-    await loadStudents();
+    await Promise.all([loadStudents(), loadMajors()]);
   } catch (err: any) {
-    console.error("Failed to load students:", err.message);
+    console.error("Failed to load startup data:", err.message);
   }
 
 });

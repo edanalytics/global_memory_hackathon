@@ -27,7 +27,11 @@ export default function ChatPane({ student, api, onRefresh }: Props) {
     fetch(`${api}/students/${student.id}/summary`)
       .then((r) => r.json())
       .then((data) => {
-        setMessages([{ role: "assistant", content: data.summary }]);
+        const msgs: ChatMessage[] = [{ role: "assistant", content: data.summary }];
+        if (data.history) {
+          msgs.push(...data.history);
+        }
+        setMessages(msgs);
       })
       .catch(console.error)
       .finally(() => setSummaryLoading(false));
