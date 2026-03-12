@@ -5,8 +5,8 @@ import StudentView from "./StudentView";
 export interface StudentSummary {
   id: string;
   name: string;
-  grade: number;
-  gpa: number;
+  displayName: string;
+  gradeLevel: string;
 }
 
 const API = "http://localhost:3001/api";

@@ -1,43 +1,69 @@
+import { query } from "./snowflake.js";
+
 export interface Student {
   id: string;
   name: string;
-  grade: number;
-  gpa: number;
-  interests: string[];
-  notes: string;
+  displayName: string;
+  gradeLevel: string;
+  birthDate: string;
+  gender: string;
+  raceEthnicity: string;
+  isEconomicDisadvantaged: boolean;
+  isELL: boolean;
+  isSpecialEducation: boolean;
+  is504Eligible: boolean | null;
+  schoolYear: number;
 }
 
-export const students: Student[] = [
-  {
-    id: "1",
-    name: "Maria Santos",
-    grade: 11,
-    gpa: 3.7,
-    interests: ["biology", "volunteering", "debate"],
-    notes: "Interested in pre-med track. First-generation college student.",
-  },
-  {
-    id: "2",
-    name: "James Chen",
-    grade: 12,
-    gpa: 3.2,
-    interests: ["computer science", "gaming", "robotics club"],
-    notes: "Strong in STEM but struggling with essay writing. Considering community college transfer path.",
-  },
-  {
-    id: "3",
-    name: "Aisha Johnson",
-    grade: 11,
-    gpa: 3.9,
-    interests: ["creative writing", "theater", "social justice"],
-    notes: "Looking at liberal arts colleges. Needs financial aid guidance.",
-  },
-  {
-    id: "4",
-    name: "Tyler Rivera",
-    grade: 12,
-    gpa: 2.8,
-    interests: ["auto shop", "sports", "part-time job"],
-    notes: "Exploring trade schools and apprenticeships. Works 20hrs/week.",
-  },
-];
+interface DimStudentRow {
+  K_STUDENT: string;
+  FIRST_NAME: string;
+  LAST_NAME: string;
+  DISPLAY_NAME: string;
+  GRADE_LEVEL: string;
+  BIRTH_DATE: string;
+  GENDER: string;
+  RACE_ETHNICITY: string;
+  IS_ECONOMIC_DISADVANTAGED: boolean;
+  IS_ENGLISH_LANGUAGE_LEARNER_SCH_ACTIVE: boolean;
+  IS_SPECIAL_EDUCATION_SCH_ACTIVE: boolean;
+  IS_504_ELIGIBLE: boolean | null;
+  SCHOOL_YEAR: number;
+  IS_LATEST_RECORD: boolean;
+}
+
+function mapRow(row: DimStudentRow): Student {
+  return {
+    id: row.K_STUDENT,
+    name: `${row.FIRST_NAME} ${row.LAST_NAME}`,
+    displayName: row.DISPLAY_NAME,
+    gradeLevel: row.GRADE_LEVEL,
+    birthDate: row.BIRTH_DATE,
+    gender: row.GENDER,
+    raceEthnicity: row.RACE_ETHNICITY,
+    isEconomicDisadvantaged: row.IS_ECONOMIC_DISADVANTAGED,
+    isELL: row.IS_ENGLISH_LANGUAGE_LEARNER_SCH_ACTIVE,
+    isSpecialEducation: row.IS_SPECIAL_EDUCATION_SCH_ACTIVE,
+    is504Eligible: row.IS_504_ELIGIBLE,
+    schoolYear: row.SCHOOL_YEAR,
+  };
+}
+
+// In-memory cache loaded on startup
+let students: Student[] = [];
+
+export async function loadStudents(): Promise<void> {
+  const rows = await query<DimStudentRow>(
+    "SELECT * FROM dev_analytics.dev_rl_wh.dim_student WHERE IS_LATEST_RECORD = TRUE AND GRADE_LEVEL = '12' ORDER BY LAST_NAME, FIRST_NAME"
+  );
+  students = rows.map(mapRow);
+  console.log(`Loaded ${students.length} students from Snowflake`);
+}
+
+export function getStudents(): Student[] {
+  return students;
+}
+
+export function getStudentById(id: string): Student | undefined {
+  return students.find((s) => s.id === id);
+}

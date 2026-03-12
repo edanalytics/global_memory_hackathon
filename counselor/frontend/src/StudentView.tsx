@@ -1,9 +1,24 @@
 import { useEffect, useState, FormEvent } from "react";
-import { StudentSummary } from "./App";
+import type { StudentSummary } from "./App";
 
 interface Props {
   student: StudentSummary;
   api: string;
+}
+
+interface StudentDetail {
+  id: string;
+  name: string;
+  displayName: string;
+  gradeLevel: string;
+  birthDate: string;
+  gender: string;
+  raceEthnicity: string;
+  isEconomicDisadvantaged: boolean;
+  isELL: boolean;
+  isSpecialEducation: boolean;
+  is504Eligible: boolean | null;
+  schoolYear: number;
 }
 
 interface ChatMessage {
@@ -11,7 +26,55 @@ interface ChatMessage {
   content: string;
 }
 
+function ProfileCard({ s }: { s: StudentDetail }) {
+  const flags = [
+    s.isEconomicDisadvantaged && "Economically Disadvantaged",
+    s.isELL && "ELL",
+    s.isSpecialEducation && "Special Education",
+    s.is504Eligible && "504 Eligible",
+  ].filter(Boolean);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        flexWrap: "wrap",
+        fontSize: 13,
+        color: "#555",
+        padding: "8px 0",
+        borderBottom: "1px solid #eee",
+        marginBottom: 12,
+      }}
+    >
+      <span><b>Grade</b> {s.gradeLevel}</span>
+      <span><b>Gender</b> {s.gender}</span>
+      <span><b>Race/Ethnicity</b> {s.raceEthnicity}</span>
+      <span><b>DOB</b> {s.birthDate}</span>
+      {flags.length > 0 && (
+        <span>
+          {flags.map((f) => (
+            <span
+              key={f as string}
+              style={{
+                background: "#fff3e0",
+                borderRadius: 4,
+                padding: "2px 6px",
+                marginRight: 4,
+                fontSize: 12,
+              }}
+            >
+              {f}
+            </span>
+          ))}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function StudentView({ student, api }: Props) {
+  const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [summary, setSummary] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -23,6 +86,7 @@ export default function StudentView({ student, api }: Props) {
     fetch(`${api}/students/${student.id}/summary`)
       .then((r) => r.json())
       .then((data) => {
+        setDetail(data.student);
         setSummary(data.summary);
         setMessages([]);
       })
@@ -71,24 +135,28 @@ export default function StudentView({ student, api }: Props) {
         padding: "0 24px",
       }}
     >
-      <h2 style={{ marginBottom: 4 }}>{student.name}</h2>
-      <div style={{ fontSize: 14, color: "#666", marginBottom: 16 }}>
-        Grade {student.grade} &middot; GPA {student.gpa}
-      </div>
+      {/* Header + Profile */}
+      <h2 style={{ marginBottom: 0, marginTop: 16 }}>{student.name}</h2>
+      {detail && <ProfileCard s={detail} />}
 
-      {/* Summary */}
+      {/* AI Insights */}
       <div
         style={{
           background: "#f0f7ff",
           borderRadius: 8,
-          padding: 16,
-          marginBottom: 16,
-          whiteSpace: "pre-wrap",
-          fontSize: 14,
+          padding: "10px 14px",
+          marginBottom: 12,
+          fontSize: 13,
           lineHeight: 1.6,
+          whiteSpace: "pre-wrap",
+          maxHeight: 180,
+          overflow: "auto",
         }}
       >
-        {loading ? "Generating session prep summary..." : summary}
+        <div style={{ fontWeight: 600, marginBottom: 4, fontSize: 12, color: "#666" }}>
+          AI INSIGHTS
+        </div>
+        {loading ? "Generating..." : summary}
       </div>
 
       {/* Chat messages */}

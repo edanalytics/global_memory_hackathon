@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StudentSummary } from "./App";
+import type { StudentSummary } from "./App";
 
 interface Props {
   api: string;
@@ -33,7 +33,7 @@ export default function StudentList({ api, selected, onSelect }: Props) {
         >
           <div style={{ fontWeight: 500 }}>{s.name}</div>
           <div style={{ fontSize: 13, color: "#666" }}>
-            Grade {s.grade} &middot; GPA {s.gpa}
+            Grade {s.gradeLevel}
           </div>
         </div>
       ))}

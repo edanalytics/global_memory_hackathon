@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { students } from "./students.js";
+import { loadStudents, getStudents, getStudentById } from "./students.js";
 import { generateSummary, chat } from "./chat.js";
 
 const app = express();
@@ -10,12 +10,19 @@ app.use(express.json());
 
 // Get all students
 app.get("/api/students", (_req, res) => {
-  res.json(students.map(({ id, name, grade, gpa }) => ({ id, name, grade, gpa })));
+  res.json(
+    getStudents().map(({ id, name, displayName, gradeLevel }) => ({
+      id,
+      name,
+      displayName,
+      gradeLevel,
+    })),
+  );
 });
 
 // Get student detail + AI summary
 app.get("/api/students/:id/summary", async (req, res) => {
-  const student = students.find((s) => s.id === req.params.id);
+  const student = getStudentById(req.params.id);
   if (!student) return res.status(404).json({ error: "Student not found" });
 
   try {
@@ -29,7 +36,7 @@ app.get("/api/students/:id/summary", async (req, res) => {
 
 // Chat with AI about a student
 app.post("/api/students/:id/chat", async (req, res) => {
-  const student = students.find((s) => s.id === req.params.id);
+  const student = getStudentById(req.params.id);
   if (!student) return res.status(404).json({ error: "Student not found" });
 
   const { message } = req.body;
@@ -44,6 +51,12 @@ app.post("/api/students/:id/chat", async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
+app.listen(3001, async () => {
   console.log("Counselor backend running on http://localhost:3001");
+
+  try {
+    await loadStudents();
+  } catch (err: any) {
+    console.error("Failed to load students:", err.message);
+  }
 });
