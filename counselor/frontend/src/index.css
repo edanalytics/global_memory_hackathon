@@ -5,6 +5,10 @@
 }
 
 /* Markdown inside chat bubbles */
+.chat-bubble {
+  overflow-x: auto;
+  min-width: 0;
+}
 .chat-bubble p {
   margin: 0 0 8px 0;
 }
@@ -33,7 +37,7 @@
 }
 .chat-bubble table {
   border-collapse: collapse;
-  width: 100%;
+  max-width: 100%;
   margin: 8px 0;
   font-size: 13px;
 }
@@ -41,6 +45,7 @@
   border: 1px solid #ddd;
   padding: 6px 10px;
   text-align: left;
+  word-break: break-word;
 }
 .chat-bubble th {
   background: rgba(0,0,0,0.04);

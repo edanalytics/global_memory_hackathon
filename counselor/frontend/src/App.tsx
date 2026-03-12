@@ -23,7 +23,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "system-ui" }}>
+    <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden", fontFamily: "system-ui" }}>
       {/* Left: Student list */}
       <div
         style={{
@@ -40,7 +40,7 @@ export default function App() {
       {selected ? (
         <>
           {/* Middle: Chat */}
-          <div style={{ flex: 1, overflow: "hidden" }}>
+          <div style={{ flex: 1, overflow: "hidden", minWidth: 0 }}>
             <ChatPane
               key={`${selected.id}-${refreshKey}`}
               student={selected}

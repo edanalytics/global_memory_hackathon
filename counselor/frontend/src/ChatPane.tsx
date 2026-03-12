@@ -79,6 +79,9 @@ export default function ChatPane({ student, api, onRefresh }: Props) {
         flexDirection: "column",
         height: "100%",
         padding: "0 24px",
+        overflow: "hidden",
+        minWidth: 0,
+        maxWidth: "100%",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, marginBottom: 12 }}>
@@ -101,7 +104,7 @@ export default function ChatPane({ student, api, onRefresh }: Props) {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflow: "auto", marginBottom: 16 }}>
+      <div style={{ flex: 1, overflow: "auto", marginBottom: 16, minWidth: 0 }}>
         {summaryLoading && (
           <div style={{ color: "#888", fontSize: 14, padding: "12px 0" }}>
             Generating summary...
@@ -118,8 +121,8 @@ export default function ChatPane({ student, api, onRefresh }: Props) {
             <div
               className={msg.role === "assistant" ? "chat-bubble" : undefined}
               style={{
-                display: "inline-block",
-                maxWidth: "85%",
+                display: msg.role === "user" ? "inline-block" : "block",
+                maxWidth: msg.role === "user" ? "85%" : "100%",
                 padding: "10px 14px",
                 borderRadius: 12,
                 background: msg.role === "user" ? "#1976d2" : "#f0f0f0",
