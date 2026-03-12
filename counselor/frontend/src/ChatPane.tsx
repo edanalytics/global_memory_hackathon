@@ -1,4 +1,5 @@
-import { useEffect, useState, FormEvent, useRef } from "react";
+import { useEffect, useState, useRef, type FormEvent } from "react";
+import Markdown from "react-markdown";
 import type { StudentSummary } from "./App";
 
 interface Props {
@@ -95,6 +96,7 @@ export default function ChatPane({ student, api }: Props) {
             }}
           >
             <div
+              className={msg.role === "assistant" ? "chat-bubble" : undefined}
               style={{
                 display: "inline-block",
                 maxWidth: "85%",
@@ -104,11 +106,15 @@ export default function ChatPane({ student, api }: Props) {
                 color: msg.role === "user" ? "#fff" : "#333",
                 fontSize: 14,
                 lineHeight: 1.5,
-                whiteSpace: "pre-wrap",
+                whiteSpace: msg.role === "user" ? "pre-wrap" : "normal",
                 textAlign: "left",
               }}
             >
-              {msg.content}
+              {msg.role === "assistant" ? (
+                <Markdown>{msg.content}</Markdown>
+              ) : (
+                msg.content
+              )}
             </div>
           </div>
         ))}

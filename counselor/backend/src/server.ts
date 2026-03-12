@@ -1,4 +1,6 @@
 import "dotenv/config";
+import path from "path";
+import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import { loadStudents, getStudents, getStudentById } from "./students.js";
@@ -71,6 +73,15 @@ app.post("/api/students/:id/chat", async (req, res) => {
     console.error("Chat error:", err.message);
     res.status(500).json({ error: "Failed to get response" });
   }
+});
+
+// Serve static frontend in production (Docker)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = path.join(__dirname, "..", "public");
+app.use(express.static(publicDir));
+app.get("*", (_req, res, next) => {
+  if (_req.path.startsWith("/api")) return next();
+  res.sendFile(path.join(publicDir, "index.html"));
 });
 
 app.listen(3001, async () => {

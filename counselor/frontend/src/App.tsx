@@ -10,7 +10,7 @@ export interface StudentSummary {
   gradeLevel: string;
 }
 
-const API = "http://localhost:3001/api";
+const API = import.meta.env.DEV ? "http://localhost:3001/api" : "/api";
 
 export default function App() {
   const [selected, setSelected] = useState<StudentSummary | null>(null);
@@ -40,7 +40,7 @@ export default function App() {
           {/* Right: Summary + CLR */}
           <div
             style={{
-              width: 360,
+              width: 540,
               borderLeft: "1px solid #ddd",
               overflow: "auto",
               background: "#fafafa",

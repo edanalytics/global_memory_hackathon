@@ -3,3 +3,31 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+/* Markdown inside chat bubbles */
+.chat-bubble p {
+  margin: 0 0 8px 0;
+}
+.chat-bubble p:last-child {
+  margin-bottom: 0;
+}
+.chat-bubble ul, .chat-bubble ol {
+  margin: 4px 0 8px 20px;
+}
+.chat-bubble li {
+  margin-bottom: 2px;
+}
+.chat-bubble h1, .chat-bubble h2, .chat-bubble h3, .chat-bubble h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 8px 0 4px 0;
+}
+.chat-bubble code {
+  background: rgba(0,0,0,0.06);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 13px;
+}
+.chat-bubble strong {
+  font-weight: 600;
+}
