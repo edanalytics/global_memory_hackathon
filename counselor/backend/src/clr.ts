@@ -36,6 +36,10 @@ interface GoalRow {
 // In-memory cache
 const clrCache = new Map<string, ClrData | null>();
 
+export function clearClrCache(studentId: string) {
+  clrCache.delete(studentId);
+}
+
 async function fetchGoals(studentId: string): Promise<StudentGoal[]> {
   try {
     const rows = await query<GoalRow>(

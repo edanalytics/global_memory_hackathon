@@ -5,6 +5,7 @@ import type { StudentSummary } from "./App";
 interface Props {
   student: StudentSummary;
   api: string;
+  onRefresh: () => void;
 }
 
 interface ChatMessage {
@@ -12,7 +13,7 @@ interface ChatMessage {
   content: string;
 }
 
-export default function ChatPane({ student, api }: Props) {
+export default function ChatPane({ student, api, onRefresh }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -75,9 +76,23 @@ export default function ChatPane({ student, api }: Props) {
         padding: "0 24px",
       }}
     >
-      <h2 style={{ marginBottom: 0, marginTop: 16 }}>{student.name}</h2>
-      <div style={{ fontSize: 13, color: "#666", marginBottom: 12, paddingTop: 4 }}>
-        Grade {student.gradeLevel}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>{student.name}</h2>
+        <button
+          onClick={onRefresh}
+          disabled={summaryLoading}
+          style={{
+            padding: "4px 12px",
+            borderRadius: 6,
+            border: "1px solid #ddd",
+            background: "#fff",
+            cursor: "pointer",
+            fontSize: 12,
+            color: "#555",
+          }}
+        >
+          Refresh
+        </button>
       </div>
 
       {/* Messages */}

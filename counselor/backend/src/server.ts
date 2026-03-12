@@ -4,8 +4,8 @@ import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import { loadStudents, getStudents, getStudentById } from "./students.js";
-import { generateSummary, chat } from "./chat.js";
-import { getClrData } from "./clr.js";
+import { generateSummary, chat, clearStudentCache } from "./chat.js";
+import { getClrData, clearClrCache } from "./clr.js";
 
 const app = express();
 app.use(cors());
@@ -73,6 +73,16 @@ app.post("/api/students/:id/chat", async (req, res) => {
     console.error("Chat error:", err.message);
     res.status(500).json({ error: "Failed to get response" });
   }
+});
+
+// Reset cached data for a student
+app.post("/api/students/:id/reset", (req, res) => {
+  const student = getStudentById(req.params.id);
+  if (!student) return res.status(404).json({ error: "Student not found" });
+
+  clearStudentCache(student.id);
+  clearClrCache(student.id);
+  res.json({ ok: true });
 });
 
 // Serve static frontend in production (Docker)

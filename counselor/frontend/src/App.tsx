@@ -14,6 +14,13 @@ const API = import.meta.env.DEV ? "http://localhost:3001/api" : "/api";
 
 export default function App() {
   const [selected, setSelected] = useState<StudentSummary | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  async function handleRefresh() {
+    if (!selected) return;
+    await fetch(`${API}/students/${selected.id}/reset`, { method: "POST" });
+    setRefreshKey((k) => k + 1);
+  }
 
   return (
     <div style={{ display: "flex", height: "100vh", fontFamily: "system-ui" }}>
@@ -34,7 +41,12 @@ export default function App() {
         <>
           {/* Middle: Chat */}
           <div style={{ flex: 1, overflow: "hidden" }}>
-            <ChatPane key={selected.id} student={selected} api={API} />
+            <ChatPane
+              key={`${selected.id}-${refreshKey}`}
+              student={selected}
+              api={API}
+              onRefresh={handleRefresh}
+            />
           </div>
 
           {/* Right: Summary + CLR */}
@@ -47,7 +59,7 @@ export default function App() {
               flexShrink: 0,
             }}
           >
-            <SummaryPane key={`summary-${selected.id}`} student={selected} api={API} />
+            <SummaryPane key={`summary-${selected.id}-${refreshKey}`} student={selected} api={API} />
           </div>
         </>
       ) : (
