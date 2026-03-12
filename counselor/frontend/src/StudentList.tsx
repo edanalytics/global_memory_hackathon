@@ -32,9 +32,6 @@ export default function StudentList({ api, selected, onSelect }: Props) {
           }}
         >
           <div style={{ fontWeight: 500 }}>{s.name}</div>
-          <div style={{ fontSize: 13, color: "#666" }}>
-            Grade {s.gradeLevel}
-          </div>
         </div>
       ))}
     </div>

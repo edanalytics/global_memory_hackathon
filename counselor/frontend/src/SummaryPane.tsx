@@ -108,8 +108,6 @@ export default function SummaryPane({ student, api }: Props) {
       {/* Demographics */}
       {detail && (
         <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "4px 12px", fontSize: 13 }}>
-          <span style={{ color: "#888" }}>Grade</span>
-          <span>{detail.gradeLevel}</span>
           <span style={{ color: "#888" }}>Gender</span>
           <span>{detail.gender}</span>
           <span style={{ color: "#888" }}>Race/Ethnicity</span>
