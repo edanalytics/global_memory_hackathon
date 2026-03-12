@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, type FormEvent } from "react";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { StudentSummary } from "./App";
 
 interface Props {
@@ -130,7 +131,7 @@ export default function ChatPane({ student, api, onRefresh }: Props) {
               }}
             >
               {msg.role === "assistant" ? (
-                <Markdown>{msg.content}</Markdown>
+                <Markdown remarkPlugins={[remarkGfm]}>{msg.content}</Markdown>
               ) : (
                 msg.content
               )}

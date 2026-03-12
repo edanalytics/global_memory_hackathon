@@ -31,3 +31,21 @@
 .chat-bubble strong {
   font-weight: 600;
 }
+.chat-bubble table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.chat-bubble th, .chat-bubble td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  text-align: left;
+}
+.chat-bubble th {
+  background: rgba(0,0,0,0.04);
+  font-weight: 600;
+}
+.chat-bubble tr:nth-child(even) {
+  background: rgba(0,0,0,0.02);
+}
